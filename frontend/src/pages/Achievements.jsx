@@ -6,14 +6,14 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import Loader from "../components/Loader";
 import { getAchievements, createAchievement, updateAchievement, deleteAchievement } from "../api/achievementApi";
 
-const inputClass = "w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition text-sm";
+const inputClass = "app-input";
 const emptyForm = { title: "", description: "", category: "", file: null };
 
 const categoryColors = {
-  Competition: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
-  Award: "bg-purple-500/15 text-purple-400 border-purple-500/20",
-  Recognition: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-  Academic: "bg-green-500/15 text-green-400 border-green-500/20",
+  Competition: "bg-amber-50 text-amber-700 border-amber-100",
+  Award: "bg-violet-50 text-violet-700 border-violet-100",
+  Recognition: "bg-blue-50 text-blue-700 border-blue-100",
+  Academic: "bg-emerald-50 text-emerald-700 border-emerald-100",
 };
 
 export default function Achievements() {
@@ -91,8 +91,8 @@ export default function Achievements() {
     <DashboardLayout>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Achievements</h1>
-          <p className="text-slate-400 mt-1">Showcase your awards, competitions, and recognitions.</p>
+          <h1 className="text-3xl font-black text-slate-950">Achievements</h1>
+          <p className="text-slate-600 mt-1">Showcase your awards, competitions, and recognitions.</p>
         </div>
         <button onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition px-5 py-2.5 rounded-xl text-white font-semibold text-sm">
@@ -104,26 +104,26 @@ export default function Achievements() {
         {showForm && (
           <motion.div
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
-            className="bg-slate-900 border border-slate-700 rounded-2xl p-6 mb-8 overflow-hidden">
+            className="app-card mb-8 overflow-hidden p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Trophy size={20} className="text-yellow-400" />
+              <h2 className="text-xl font-bold text-slate-950 flex items-center gap-2">
+                <Trophy size={20} className="text-amber-600" />
                 {editingId ? "Edit Achievement" : "Add Achievement"}
               </h2>
               <button onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }}
-                className="text-slate-400 hover:text-white transition">
+                className="text-slate-400 hover:text-slate-950 transition">
                 <X size={20} />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Title *</label>
+                  <label className="app-label">Title *</label>
                   <input name="title" value={form.title} onChange={handleChange}
                     placeholder="e.g. 1st Place Hackathon" className={inputClass} required />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Category</label>
+                  <label className="app-label">Category</label>
                   <select name="category" value={form.category} onChange={handleChange} className={inputClass}>
                     <option value="">Select Category</option>
                     <option>Competition</option>
@@ -135,14 +135,14 @@ export default function Achievements() {
                 </div>
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Description *</label>
+                <label className="app-label">Description *</label>
                 <textarea name="description" value={form.description} onChange={handleChange} rows={3}
                   placeholder="Describe your achievement..." className={`${inputClass} resize-none`} required />
               </div>
               <div className="mb-5">
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Upload Proof (PDF/Image)</label>
+                <label className="app-label">Upload Proof (PDF/Image)</label>
                 <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleChange}
-                  className={`${inputClass} file:mr-3 file:bg-slate-700 file:text-white file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:text-sm cursor-pointer`} />
+                  className={`${inputClass} cursor-pointer file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-blue-700`} />
               </div>
               <div className="flex gap-3">
                 <button type="submit" disabled={submitting}
@@ -151,7 +151,7 @@ export default function Achievements() {
                   {submitting ? "Saving..." : editingId ? "Update" : "Add Achievement"}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }}
-                  className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition text-white text-sm">
+                  className="app-button-secondary">
                   Cancel
                 </button>
               </div>
@@ -163,10 +163,10 @@ export default function Achievements() {
       {loading ? (
         <div className="flex items-center justify-center h-64"><Loader /></div>
       ) : items.length === 0 ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-16 text-center">
-          <Trophy size={48} className="mx-auto text-slate-600 mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">No Achievements Yet</h2>
-          <p className="text-slate-400">Add your first achievement to showcase your talent.</p>
+        <div className="app-card p-16 text-center">
+          <Trophy size={48} className="mx-auto text-slate-300 mb-4" />
+          <h2 className="text-xl font-bold text-slate-950 mb-2">No Achievements Yet</h2>
+          <p className="text-slate-600">Add your first achievement to showcase your talent.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -174,27 +174,27 @@ export default function Achievements() {
             <motion.div
               key={item._id}
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className="bg-slate-900 border border-slate-800 hover:border-slate-600 transition-colors rounded-2xl p-5">
+              className="app-card p-5 transition hover:border-blue-200 hover:shadow-md">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-2">
-                    <h2 className="text-lg font-bold text-white">{item.title}</h2>
+                    <h2 className="text-lg font-bold text-slate-950">{item.title}</h2>
                     {item.verified && (
                       <span className="flex items-center gap-1 text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/20 px-2 py-0.5 rounded-full">
                         <BadgeCheck size={11} /> Verified
                       </span>
                     )}
                   </div>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-3">{item.description}</p>
+                  <p className="text-slate-600 text-sm leading-relaxed mb-3">{item.description}</p>
                   {item.category && (
-                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${categoryColors[item.category] || "bg-slate-800 text-slate-400 border-slate-700"}`}>
+                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${categoryColors[item.category] || "bg-slate-100 text-slate-600 border-slate-200"}`}>
                       {item.category}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-2 ml-3">
                   <button onClick={() => handleEdit(item)}
-                    className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition text-slate-300">
+                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition text-slate-600">
                     <Pencil size={15} />
                   </button>
                   <button onClick={() => handleDelete(item._id)}

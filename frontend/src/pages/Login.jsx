@@ -39,31 +39,48 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-slate-50 px-4 py-10">
+      <div className="mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-6xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <section className="hidden lg:block">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">
+            <ShieldCheck size={16} />
+            VERIFOLIO DIGITAL PLATFORM
+          </div>
+          <h1 className="max-w-xl text-5xl font-black leading-tight text-slate-950">
+            Manage your verified portfolio from one professional dashboard.
+          </h1>
+          <p className="mt-5 max-w-lg text-lg leading-8 text-slate-600">
+            Sign in to update projects, profile links, certifications, verification requests,
+            endorsements, and analytics.
+          </p>
+        </section>
+
+        <div className="w-full max-w-md justify-self-center">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold text-white">
-            <ShieldCheck size={28} className="text-blue-500" />
-            VeriFolio
+          <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold text-slate-950">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white">
+              <ShieldCheck size={25} />
+            </span>
+            VERIFOLIO
           </Link>
-          <p className="text-slate-400 mt-2">Sign in to your professional portfolio</p>
+          <p className="text-slate-600 mt-2">Sign in to your professional portfolio</p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-slate-900 border border-slate-800 rounded-2xl p-8"
+          className="app-card p-8"
         >
-          <h1 className="text-2xl font-bold text-white mb-6">Welcome Back</h1>
+          <h1 className="text-2xl font-bold text-slate-950 mb-6">Welcome Back</h1>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+              <label className="app-label">Email Address</label>
               <input
                 type="email"
                 name="email"
@@ -71,12 +88,12 @@ export default function Login() {
                 onChange={handleChange}
                 placeholder="john@example.com"
                 required
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
+                className="app-input"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+              <label className="app-label">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -85,12 +102,12 @@ export default function Login() {
                   onChange={handleChange}
                   placeholder="Your password"
                   required
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 pr-12 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
+                  className="app-input pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-600"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -100,7 +117,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition py-3.5 rounded-xl text-white font-semibold flex items-center justify-center gap-2 mt-2"
+              className="app-button-primary mt-2 w-full py-3.5"
             >
               {loading ? (
                 <>
@@ -113,13 +130,14 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="text-center mt-6 text-slate-400 text-sm">
+          <p className="text-center mt-6 text-slate-600 text-sm">
             Don&apos;t have an account?{" "}
-            <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium transition">
+            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium transition">
               Create Account
             </Link>
           </p>
         </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -1,76 +1,68 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  ShieldCheck, FolderKanban, Award, ThumbsUp,
-  BarChart3, Globe, Github, ArrowRight, CheckCircle2,
-  Zap, Lock, Users
+  ArrowRight,
+  Award,
+  BarChart3,
+  CheckCircle2,
+  Code2,
+  ExternalLink,
+  FileCheck2,
+  FolderKanban,
+  Github,
+  Globe2,
+  Linkedin,
+  ShieldCheck,
+  Sparkles,
+  Users,
 } from "lucide-react";
 
 const features = [
   {
-    icon: ShieldCheck,
-    title: "Verified Credentials",
-    desc: "Admin-verified badges on your projects, certifications, and achievements build instant trust.",
-    color: "text-blue-500",
-    bg: "bg-blue-500/10",
-  },
-  {
     icon: FolderKanban,
-    title: "Portfolio Showcase",
-    desc: "Display your full professional portfolio with GitHub links, live demos, and tech stacks.",
-    color: "text-purple-500",
-    bg: "bg-purple-500/10",
+    title: "Project Portfolio",
+    desc: "Publish projects with descriptions, technology stacks, GitHub repositories, live links, and supporting files.",
   },
   {
-    icon: ThumbsUp,
-    title: "Skill Endorsements",
-    desc: "Receive peer endorsements on your skills from verified professionals in the community.",
-    color: "text-green-500",
-    bg: "bg-green-500/10",
+    icon: FileCheck2,
+    title: "Verification Workflow",
+    desc: "Request verification for achievements, certifications, and projects so every important item can carry proof.",
+  },
+  {
+    icon: Code2,
+    title: "Coding Profiles",
+    desc: "Connect GitHub, LinkedIn, LeetCode, HackerRank, CodeChef, and a personal website from one public profile.",
   },
   {
     icon: BarChart3,
-    title: "Analytics Dashboard",
-    desc: "Track profile views, project engagement, and your verification history with clear charts.",
-    color: "text-orange-500",
-    bg: "bg-orange-500/10",
+    title: "Portfolio Analytics",
+    desc: "Track views and portfolio activity with a focused dashboard built for students and professionals.",
   },
   {
-    icon: Globe,
-    title: "Public Portfolio URL",
-    desc: "Share your verified portfolio at verifolio.app/u/yourname with employers and clients.",
-    color: "text-cyan-500",
-    bg: "bg-cyan-500/10",
+    icon: Users,
+    title: "Endorsements",
+    desc: "Let peers and mentors endorse your work so your public profile feels trusted and complete.",
   },
   {
-    icon: Lock,
-    title: "Privacy Control",
-    desc: "Toggle your profile public or private anytime. You control what the world sees.",
-    color: "text-rose-500",
-    bg: "bg-rose-500/10",
+    icon: Globe2,
+    title: "Public Profile URL",
+    desc: "Share a clean portfolio link that can be opened from any browser on mobile, laptop, or desktop.",
   },
 ];
 
 const steps = [
-  { step: "01", title: "Create Account", desc: "Sign up and build your professional profile in minutes." },
-  { step: "02", title: "Add Portfolio", desc: "Upload projects, certifications, and achievements with proof files." },
-  { step: "03", title: "Request Verification", desc: "Submit verification requests to get your credentials verified by admins." },
-  { step: "04", title: "Share & Grow", desc: "Share your public portfolio URL and let your verified work speak for itself." },
-];
-
-const stats = [
-  { value: "10K+", label: "Portfolios Created" },
-  { value: "50K+", label: "Verified Credentials" },
-  { value: "99%", label: "Verification Accuracy" },
-  { value: "500+", label: "Organizations Trust Us" },
+  "Create your account and profile",
+  "Add projects, certificates, achievements, and work history",
+  "Connect GitHub and coding profile links",
+  "Request verification and share your public URL",
 ];
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 24 },
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, delay: i * 0.1, ease: "easeOut" },
+    transition: { duration: 0.45, delay: i * 0.08, ease: "easeOut" },
   }),
 };
 
@@ -78,350 +70,227 @@ export default function Landing() {
   const githubUrl = import.meta.env.VITE_GITHUB_URL || "https://github.com";
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-950">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+          <Link to="/" className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+              <ShieldCheck size={22} />
+            </span>
+            <span>
+              <span className="block text-sm font-bold leading-tight">VERIFOLIO</span>
+              <span className="block text-xs font-medium text-slate-500">Digital Platform</span>
+            </span>
+          </Link>
 
-      {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={24} className="text-blue-500" />
-            <span className="text-xl font-bold">VeriFolio</span>
-          </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <a
               href={githubUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2 text-slate-400 hover:text-white transition text-sm"
+              className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-700 sm:flex"
             >
-              <Github size={18} />
-              <span className="hidden sm:inline">GitHub</span>
+              <Github size={17} />
+              GitHub
             </a>
-            <Link
-              to="/login"
-              className="text-slate-300 hover:text-white transition text-sm px-4 py-2"
-            >
+            <Link to="/login" className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:text-blue-700">
               Login
             </Link>
-            <Link
-              to="/register"
-              className="bg-blue-600 hover:bg-blue-700 transition px-5 py-2 rounded-xl text-sm font-semibold"
-            >
+            <Link to="/register" className="app-button-primary px-4 py-2">
               Get Started
             </Link>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
 
-      {/* HERO */}
-      <section className="relative pt-32 pb-24 px-6 overflow-hidden">
-        {/* Gradient orbs */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-40 left-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+      <main>
+        <section className="border-b border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] px-4 py-16 sm:px-6 lg:py-24">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+            <motion.div variants={fadeUp} initial="hidden" animate="visible">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">
+                <Sparkles size={16} />
+                Professional digital portfolio and verification platform
+              </div>
+              <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-normal text-slate-950 sm:text-5xl lg:text-6xl">
+                VERIFOLIO DIGITAL PLATFORM
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+                Build a public portfolio that shows your projects, certifications, achievements,
+                coding profiles, GitHub repositories, and verification status in one polished place.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link to="/register" className="app-button-primary px-6 py-3 text-base">
+                  Create Portfolio
+                  <ArrowRight size={18} />
+                </Link>
+                <a href={githubUrl} target="_blank" rel="noreferrer" className="app-button-secondary px-6 py-3 text-base">
+                  <Github size={18} />
+                  View Project GitHub
+                </a>
+              </div>
+            </motion.div>
 
-        <div className="max-w-5xl mx-auto text-center relative">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={0}
-            className="inline-flex items-center gap-2 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-full text-blue-400 text-sm font-medium mb-8"
-          >
-            <Zap size={14} />
-            The Future of Professional Verification
-          </motion.div>
-
-          <motion.h1
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={1}
-            className="text-5xl sm:text-6xl md:text-7xl font-extrabold leading-tight mb-6"
-          >
-            Verify Your{" "}
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Achievements
-            </span>
-            <br />
-            Build Real Trust
-          </motion.h1>
-
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={2}
-            className="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
-          >
-            VeriFolio is the professional platform where your projects, certifications,
-            and achievements get verified — giving employers and clients 100% confidence
-            in your credentials.
-          </motion.p>
-
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={3}
-            className="flex flex-wrap gap-4 justify-center"
-          >
-            <Link
-              to="/register"
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition px-8 py-4 rounded-xl font-semibold text-lg"
-            >
-              Start For Free
-              <ArrowRight size={20} />
-            </Link>
-            <a
-              href={githubUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 transition px-8 py-4 rounded-xl font-semibold text-lg border border-slate-700"
-            >
-              <Github size={20} />
-              View GitHub
-            </a>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* STATS */}
-      <section className="py-16 px-6 border-y border-slate-800">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, i) => (
             <motion.div
-              key={i}
               variants={fadeUp}
               initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              custom={i * 0.1}
-              className="text-center"
+              animate="visible"
+              custom={1}
+              className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/70"
             >
-              <div className="text-3xl md:text-4xl font-extrabold text-white mb-1">{stat.value}</div>
-              <div className="text-slate-500 text-sm">{stat.label}</div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section className="py-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Everything You Need to{" "}
-              <span className="text-blue-400">Stand Out</span>
-            </h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              A complete platform for building, verifying, and sharing your professional identity.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, i) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={i}
-                  variants={fadeUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  custom={i * 0.08}
-                  whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                  className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-slate-600 transition-colors"
-                >
-                  <div className={`w-12 h-12 ${feature.bg} rounded-xl flex items-center justify-center mb-4`}>
-                    <Icon size={24} className={feature.color} />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>
-                  <p className="text-slate-400 leading-relaxed text-sm">{feature.desc}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS */}
-      <section className="py-24 px-6 bg-slate-900/50">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              How It <span className="text-blue-400">Works</span>
-            </h2>
-            <p className="text-slate-400 text-lg">Get verified in 4 simple steps</p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {steps.map((step, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i * 0.1}
-                className="relative"
-              >
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-full">
-                  <div className="text-4xl font-extrabold text-blue-500/30 mb-4">{step.step}</div>
-                  <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PUBLIC PORTFOLIO PREVIEW */}
-      <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Your Public <span className="text-blue-400">Portfolio</span>
-            </h2>
-            <p className="text-slate-400 text-lg">
-              Every profile gets a shareable URL — professional, verified, and impressive.
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="bg-slate-900 border border-slate-700 rounded-3xl overflow-hidden shadow-2xl"
-          >
-            {/* Browser chrome */}
-            <div className="bg-slate-800 px-5 py-3 flex items-center gap-3 border-b border-slate-700">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-              </div>
-              <div className="flex-1 bg-slate-700 rounded-lg px-4 py-1.5 text-slate-400 text-sm">
-                verifolio.app/u/johndoe
-              </div>
-            </div>
-            {/* Profile preview */}
-            <div className="p-8">
-              <div className="flex items-center gap-5 mb-6">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl font-bold">
-                  J
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">John Doe</div>
-                  <div className="text-slate-400">Full Stack Developer · @johndoe</div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <CheckCircle2 size={14} className="text-green-400" />
-                    <span className="text-green-400 text-sm font-medium">Verified Profile</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2 mb-6">
-                {["React", "Node.js", "MongoDB", "TypeScript", "AWS"].map((tech) => (
-                  <span key={tech} className="bg-slate-800 text-slate-300 px-3 py-1 rounded-lg text-sm">
-                    {tech}
-                  </span>
-                ))}
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  { label: "Projects", value: "12", icon: FolderKanban, color: "text-blue-400" },
-                  { label: "Certifications", value: "8", icon: Award, color: "text-green-400" },
-                  { label: "Endorsements", value: "34", icon: ThumbsUp, color: "text-purple-400" },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={item.label} className="bg-slate-800/50 rounded-xl p-4 flex items-center gap-3">
-                      <Icon size={20} className={item.color} />
-                      <div>
-                        <div className="text-lg font-bold text-white">{item.value}</div>
-                        <div className="text-slate-500 text-xs">{item.label}</div>
-                      </div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <div className="mb-5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-xl font-bold text-white">
+                      A
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+                    <div>
+                      <h2 className="text-xl font-bold text-slate-950">Aarav Sharma</h2>
+                      <p className="text-sm text-slate-500">Full Stack Developer | @aaravdev</p>
+                    </div>
+                  </div>
+                  <span className="app-badge bg-emerald-50 text-emerald-700">
+                    <CheckCircle2 size={14} />
+                    Verified
+                  </span>
+                </div>
 
-      {/* CTA */}
-      <section className="py-24 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/20 rounded-3xl p-12"
-          >
-            <Users size={48} className="mx-auto text-blue-400 mb-6" />
-            <h2 className="text-4xl font-extrabold text-white mb-4">
-              Join 10,000+ Professionals
-            </h2>
-            <p className="text-slate-400 text-lg mb-8">
-              Build your verified portfolio today. Free forever for individuals.
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {[
+                    ["Projects", "06"],
+                    ["Certificates", "04"],
+                    ["Endorsements", "11"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-2xl border border-slate-200 bg-white p-4">
+                      <div className="text-2xl font-black text-slate-950">{value}</div>
+                      <div className="text-sm text-slate-500">{label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="font-bold text-slate-950">Featured Project</h3>
+                    <a href={githubUrl} target="_blank" rel="noreferrer" className="text-blue-600">
+                      <ExternalLink size={18} />
+                    </a>
+                  </div>
+                  <p className="text-sm leading-6 text-slate-600">
+                    Digital portfolio app with authentication, project uploads, verification requests,
+                    endorsements, and analytics.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {["React", "Node.js", "MongoDB", "Express"].map((skill) => (
+                      <span key={skill} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-5 grid grid-cols-3 gap-3">
+                  <span className="flex items-center justify-center rounded-xl border border-slate-200 bg-white py-3 text-slate-700">
+                    <Github size={18} />
+                  </span>
+                  <span className="flex items-center justify-center rounded-xl border border-slate-200 bg-white py-3 text-slate-700">
+                    <Linkedin size={18} />
+                  </span>
+                  <span className="flex items-center justify-center rounded-xl border border-slate-200 bg-white py-3 text-slate-700">
+                    <Code2 size={18} />
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        <section className="px-4 py-16 sm:px-6">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 max-w-3xl">
+              <p className="text-sm font-bold uppercase tracking-widest text-blue-600">Platform Features</p>
+              <h2 className="mt-3 text-3xl font-black text-slate-950 sm:text-4xl">
+                Everything needed for a credible public profile.
+              </h2>
+            </div>
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <motion.article
+                    key={feature.title}
+                    variants={fadeUp}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    custom={index}
+                    className="app-card p-6"
+                  >
+                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                      <Icon size={22} />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-950">{feature.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{feature.desc}</p>
+                  </motion.article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-y border-slate-200 bg-white px-4 py-16 sm:px-6">
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-widest text-blue-600">How It Works</p>
+              <h2 className="mt-3 text-3xl font-black text-slate-950 sm:text-4xl">
+                From empty profile to public portfolio.
+              </h2>
+              <p className="mt-4 text-slate-600">
+                The flow is simple enough for students, but structured enough for a real production website.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {steps.map((step, index) => (
+                <div key={step} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-sm font-bold text-white">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+                  <p className="font-semibold text-slate-800">{step}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 py-16 sm:px-6">
+          <div className="mx-auto flex max-w-5xl flex-col items-center rounded-[1.5rem] border border-blue-100 bg-blue-600 px-6 py-12 text-center text-white shadow-xl shadow-blue-200 sm:px-12">
+            <ShieldCheck size={46} />
+            <h2 className="mt-5 text-3xl font-black sm:text-4xl">Start building your public verified portfolio.</h2>
+            <p className="mt-4 max-w-2xl text-blue-50">
+              Add profile photo, coding links, projects, credentials, work history, and verification requests from one dashboard.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/register"
-                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 transition px-8 py-4 rounded-xl font-semibold text-lg"
-              >
-                Create Free Account
-                <ArrowRight size={20} />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link to="/register" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-50">
+                Create Account
+                <ArrowRight size={18} />
               </Link>
-              <Link
-                to="/login"
-                className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 transition px-8 py-4 rounded-xl font-semibold text-lg border border-slate-700"
-              >
+              <Link to="/login" className="inline-flex items-center justify-center rounded-xl border border-blue-300 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500">
                 Sign In
               </Link>
             </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-slate-800 py-10 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={20} className="text-blue-500" />
-            <span className="font-bold text-white">VeriFolio</span>
-            <span className="text-slate-500 text-sm ml-2">© {new Date().getFullYear()}</span>
           </div>
-          <div className="flex items-center gap-6 text-slate-400 text-sm">
-            <Link to="/login" className="hover:text-white transition">Login</Link>
-            <Link to="/register" className="hover:text-white transition">Register</Link>
-            <a
-              href={githubUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1 hover:text-white transition"
-            >
+        </section>
+      </main>
+
+      <footer className="border-t border-slate-200 bg-white px-4 py-8 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={18} className="text-blue-600" />
+            <span className="font-bold text-slate-950">VERIFOLIO DIGITAL PLATFORM</span>
+            <span>{new Date().getFullYear()}</span>
+          </div>
+          <div className="flex items-center gap-5">
+            <Link to="/login" className="font-semibold hover:text-blue-700">Login</Link>
+            <Link to="/register" className="font-semibold hover:text-blue-700">Register</Link>
+            <a href={githubUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-semibold hover:text-blue-700">
               <Github size={16} />
               GitHub
             </a>

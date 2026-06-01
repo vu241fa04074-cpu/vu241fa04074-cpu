@@ -19,18 +19,18 @@ export default function AnalyticsChart() {
   }, []);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-full">
-      <h2 className="text-xl font-bold text-white mb-5">Weekly Activity</h2>
+    <div className="app-card h-full p-6">
+      <h2 className="mb-5 text-xl font-bold text-slate-950">Weekly Activity</h2>
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={data} barSize={28}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-          <XAxis dataKey="day" stroke="#475569" tick={{ fill: "#94a3b8", fontSize: 12 }} />
-          <YAxis stroke="#475569" tick={{ fill: "#94a3b8", fontSize: 12 }} allowDecimals={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+          <XAxis dataKey="day" stroke="#94a3b8" tick={{ fill: "#64748b", fontSize: 12 }} />
+          <YAxis stroke="#94a3b8" tick={{ fill: "#64748b", fontSize: 12 }} allowDecimals={false} />
           <Tooltip
-            contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #334155", borderRadius: "12px", color: "#fff" }}
-            cursor={{ fill: "rgba(59,130,246,0.08)" }}
+            contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", color: "#0f172a" }}
+            cursor={{ fill: "rgba(37,99,235,0.08)" }}
           />
-          <Bar dataKey="items" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="items" fill="#2563eb" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

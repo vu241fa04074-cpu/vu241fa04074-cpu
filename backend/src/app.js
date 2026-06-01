@@ -22,41 +22,41 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 
-// ✅ STEP 1: CORS FIRST - before everything else
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:5173",
-  ],
+const defaultClientOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+];
+
+const clientOrigins = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultClientOrigins, ...clientOrigins])];
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-}));
+};
 
-// ✅ STEP 2: Handle preflight OPTIONS requests
-app.options(/.*/, cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:5173",
-  ],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
-// ✅ STEP 3: Security headers
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
 
-// ✅ STEP 4: Prevent HTTP param pollution
 app.use(hpp());
 
-// ✅ STEP 5: Prevent NoSQL injection
-
-// ✅ STEP 6: Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 500,
@@ -69,11 +69,11 @@ const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
   message: "Too many auth attempts. Please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use(limiter);
-
-// ✅ STEP 7: Body parsers
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
@@ -95,7 +95,6 @@ const sanitizeObject = (value) => {
   }, {});
 };
 
-// Prevent common NoSQL injection operators without mutating Express 5 req.query.
 app.use((req, res, next) => {
   if (req.body) {
     req.body = sanitizeObject(req.body);
@@ -104,15 +103,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ STEP 8: Logger (dev only)
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
 
-// ✅ STEP 9: Static files for uploads
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// ✅ STEP 10: All API routes
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/projects", projectRoutes);
@@ -125,12 +121,13 @@ app.use("/api/users", userRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/admin", adminRoutes);
 
-// ✅ STEP 11: Health check
 app.get("/", (req, res) => {
-  res.json({ message: "VeriFolio API Running", version: "1.0.0" });
+  res.json({
+    message: "VERIFOLIO DIGITAL PLATFORM API Running",
+    version: "1.0.0",
+  });
 });
 
-// ✅ STEP 12: Error handlers last
 app.use(notFound);
 app.use(errorHandler);
 

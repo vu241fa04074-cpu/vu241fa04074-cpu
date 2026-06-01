@@ -1,23 +1,63 @@
 import { useEffect, useState, useContext } from "react";
-import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import {
-  User, Globe, Github, Linkedin, Twitter, Plus, Trash2,
-  Save, Loader2, Eye, EyeOff, ExternalLink,
+  Camera,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Github,
+  Globe,
+  Linkedin,
+  Loader2,
+  Plus,
+  Save,
+  Trash2,
+  User,
 } from "lucide-react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { getMyProfile, updateProfile } from "../api/profileApi";
 import { AuthContext } from "../context/AuthContext";
 import Loader from "../components/Loader";
 
-const inputClass = "w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition text-sm";
-const labelClass = "block text-sm font-medium text-slate-300 mb-1.5";
+const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
+
+const emptyLinks = {
+  github: "",
+  linkedin: "",
+  leetcode: "",
+  hackerrank: "",
+  codechef: "",
+  portfolio: "",
+};
+
+const linkFields = [
+  { key: "github", label: "GitHub", icon: Github, placeholder: "https://github.com/username" },
+  { key: "linkedin", label: "LinkedIn", icon: Linkedin, placeholder: "https://linkedin.com/in/username" },
+  { key: "leetcode", label: "LeetCode", badge: "LC", placeholder: "https://leetcode.com/username" },
+  { key: "hackerrank", label: "HackerRank", badge: "HR", placeholder: "https://hackerrank.com/username" },
+  { key: "codechef", label: "CodeChef", badge: "CC", placeholder: "https://www.codechef.com/users/username" },
+  { key: "portfolio", label: "Portfolio", icon: Globe, placeholder: "https://yourwebsite.com" },
+];
+
+const isValidUrl = (value) => {
+  if (!value) return true;
+
+  try {
+    const url = new URL(value);
+    return ["http:", "https:"].includes(url.protocol);
+  } catch {
+    return false;
+  }
+};
 
 export default function Profile() {
   const { user } = useContext(AuthContext);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [skillInput, setSkillInput] = useState("");
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState("");
 
   const [form, setForm] = useState({
     headline: "",
@@ -25,20 +65,27 @@ export default function Profile() {
     skills: [],
     education: [],
     workExperience: [],
-    socialLinks: { linkedin: "", github: "", portfolio: "", twitter: "" },
+    socialLinks: emptyLinks,
     isPublic: true,
   });
-
-  const [skillInput, setSkillInput] = useState("");
 
   useEffect(() => {
     fetchProfile();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (profileImagePreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(profileImagePreview);
+      }
+    };
+  }, [profileImagePreview]);
+
   const fetchProfile = async () => {
     try {
       const data = await getMyProfile();
       setProfile(data);
+      setProfileImagePreview(data.profileImage ? `${API_ORIGIN}${data.profileImage}` : "");
       setForm({
         headline: data.headline || "",
         bio: data.bio || "",
@@ -46,36 +93,72 @@ export default function Profile() {
         education: data.education?.length ? data.education : [],
         workExperience: data.workExperience?.length ? data.workExperience : [],
         socialLinks: {
-          linkedin: data.socialLinks?.linkedin || "",
-          github: data.socialLinks?.github || "",
-          portfolio: data.socialLinks?.portfolio || "",
-          twitter: data.socialLinks?.twitter || "",
+          ...emptyLinks,
+          ...(data.socialLinks || {}),
         },
         isPublic: data.isPublic !== undefined ? data.isPublic : true,
       });
     } catch {
-      toast.error("Failed to load profile");
+      toast.error("Could not load your profile.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handlePhotoChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Upload a JPG or PNG image.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Profile photo must be below 5 MB.");
+      return;
+    }
+
+    if (profileImagePreview?.startsWith("blob:")) {
+      URL.revokeObjectURL(profileImagePreview);
+    }
+
+    setProfileImageFile(file);
+    setProfileImagePreview(URL.createObjectURL(file));
+  };
+
   const handleSave = async () => {
+    const invalidLink = linkFields.find(({ key }) => !isValidUrl(form.socialLinks[key]));
+    if (invalidLink) {
+      toast.error(`${invalidLink.label} must be a valid URL.`);
+      return;
+    }
+
     try {
       setSaving(true);
       const formData = new FormData();
-      formData.append("headline", form.headline);
-      formData.append("bio", form.bio);
+      formData.append("headline", form.headline.trim());
+      formData.append("bio", form.bio.trim());
       formData.append("skills", JSON.stringify(form.skills));
       formData.append("education", JSON.stringify(form.education));
       formData.append("workExperience", JSON.stringify(form.workExperience));
       formData.append("socialLinks", JSON.stringify(form.socialLinks));
-      formData.append("isPublic", form.isPublic);
+      formData.append("isPublic", String(form.isPublic));
 
-      await updateProfile(formData);
-      toast.success("Profile saved successfully!");
-    } catch {
-      toast.error("Failed to save profile");
+      if (profileImageFile) {
+        formData.append("profileImage", profileImageFile);
+      }
+
+      const updated = await updateProfile(formData);
+      setProfile(updated);
+      setProfileImageFile(null);
+      if (updated.profileImage) {
+        setProfileImagePreview(`${API_ORIGIN}${updated.profileImage}`);
+      }
+      toast.success("Profile saved.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Could not save profile.");
     } finally {
       setSaving(false);
     }
@@ -83,49 +166,63 @@ export default function Profile() {
 
   const addSkill = () => {
     const trimmed = skillInput.trim();
-    if (trimmed && !form.skills.includes(trimmed)) {
-      setForm((prev) => ({ ...prev, skills: [...prev.skills, trimmed] }));
+    if (!trimmed) return;
+    if (form.skills.includes(trimmed)) {
       setSkillInput("");
+      return;
     }
+
+    setForm((prev) => ({ ...prev, skills: [...prev.skills, trimmed] }));
+    setSkillInput("");
   };
 
-  const removeSkill = (s) =>
-    setForm((prev) => ({ ...prev, skills: prev.skills.filter((sk) => sk !== s) }));
+  const removeSkill = (skill) => {
+    setForm((prev) => ({ ...prev, skills: prev.skills.filter((item) => item !== skill) }));
+  };
 
-  const addEducation = () =>
+  const addEducation = () => {
     setForm((prev) => ({
       ...prev,
       education: [...prev.education, { college: "", degree: "", fieldOfStudy: "", startYear: "", endYear: "" }],
     }));
-
-  const updateEducation = (i, field, value) => {
-    const updated = [...form.education];
-    updated[i] = { ...updated[i], [field]: value };
-    setForm((prev) => ({ ...prev, education: updated }));
   };
 
-  const removeEducation = (i) =>
-    setForm((prev) => ({ ...prev, education: prev.education.filter((_, idx) => idx !== i) }));
+  const updateEducation = (index, field, value) => {
+    const education = [...form.education];
+    education[index] = { ...education[index], [field]: value };
+    setForm((prev) => ({ ...prev, education }));
+  };
 
-  const addWork = () =>
+  const removeEducation = (index) => {
+    setForm((prev) => ({ ...prev, education: prev.education.filter((_, itemIndex) => itemIndex !== index) }));
+  };
+
+  const addWork = () => {
     setForm((prev) => ({
       ...prev,
       workExperience: [...prev.workExperience, { company: "", position: "", startDate: "", endDate: "", description: "" }],
     }));
-
-  const updateWork = (i, field, value) => {
-    const updated = [...form.workExperience];
-    updated[i] = { ...updated[i], [field]: value };
-    setForm((prev) => ({ ...prev, workExperience: updated }));
   };
 
-  const removeWork = (i) =>
-    setForm((prev) => ({ ...prev, workExperience: prev.workExperience.filter((_, idx) => idx !== i) }));
+  const updateWork = (index, field, value) => {
+    const workExperience = [...form.workExperience];
+    workExperience[index] = { ...workExperience[index], [field]: value };
+    setForm((prev) => ({ ...prev, workExperience }));
+  };
+
+  const removeWork = (index) => {
+    setForm((prev) => ({
+      ...prev,
+      workExperience: prev.workExperience.filter((_, itemIndex) => itemIndex !== index),
+    }));
+  };
 
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center h-64"><Loader /></div>
+        <div className="flex h-64 items-center justify-center">
+          <Loader />
+        </div>
       </DashboardLayout>
     );
   }
@@ -134,248 +231,217 @@ export default function Profile() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-3xl font-bold text-white">Edit Profile</h1>
-            <p className="text-slate-400 mt-1">Manage your professional portfolio information.</p>
+            <h1 className="text-3xl font-bold text-slate-950">Edit Profile</h1>
+            <p className="mt-1 text-slate-600">Manage the public information shown on VERIFOLIO DIGITAL PLATFORM.</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
-              onClick={() => {
-                setForm((prev) => ({ ...prev, isPublic: !prev.isPublic }));
-              }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition border ${
+              onClick={() => setForm((prev) => ({ ...prev, isPublic: !prev.isPublic }))}
+              className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
                 form.isPublic
-                  ? "bg-green-500/10 border-green-500/30 text-green-400"
-                  : "bg-slate-800 border-slate-700 text-slate-400"
+                  ? "border-green-200 bg-green-50 text-green-700"
+                  : "border-slate-200 bg-white text-slate-600"
               }`}
             >
               {form.isPublic ? <Eye size={16} /> : <EyeOff size={16} />}
               {form.isPublic ? "Public" : "Private"}
             </button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 transition px-5 py-2.5 rounded-xl text-white font-semibold text-sm"
-            >
+            <button onClick={handleSave} disabled={saving} className="app-button-primary">
               {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-              {saving ? "Saving..." : "Save Profile"}
+              {saving ? "Saving" : "Save Profile"}
             </button>
           </div>
         </div>
 
-        {/* Public URL */}
         {form.isPublic && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-6 flex items-center justify-between gap-4"
-          >
+          <div className="app-card flex flex-col justify-between gap-3 p-4 sm:flex-row sm:items-center">
             <div>
-              <p className="text-slate-300 text-sm">Your public portfolio URL:</p>
-              <a href={publicUrl} target="_blank" rel="noreferrer" className="text-blue-400 text-sm font-medium hover:underline">
+              <p className="text-sm font-medium text-slate-700">Public profile URL</p>
+              <a href={publicUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
                 {publicUrl}
               </a>
             </div>
-            <a
-              href={publicUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1 text-blue-400 text-sm hover:text-blue-300 transition"
-            >
+            <a href={publicUrl} target="_blank" rel="noreferrer" className="app-button-secondary">
               <ExternalLink size={16} />
               View
             </a>
-          </motion.div>
+          </div>
         )}
 
-        <div className="space-y-6">
-          {/* Basic Info */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <User size={18} className="text-blue-400" />
-              Basic Information
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className={labelClass}>Full Name</label>
-                <input type="text" value={user?.name || ""} readOnly
-                  className={`${inputClass} opacity-60 cursor-not-allowed`} />
-              </div>
-              <div>
-                <label className={labelClass}>Username</label>
-                <input type="text" value={`@${user?.username || ""}`} readOnly
-                  className={`${inputClass} opacity-60 cursor-not-allowed`} />
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className={labelClass}>Professional Headline</label>
-              <input
-                type="text"
-                value={form.headline}
-                onChange={(e) => setForm((p) => ({ ...p, headline: e.target.value }))}
-                placeholder="e.g. Full Stack Developer at Google"
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Bio</label>
-              <textarea
-                rows={4}
-                value={form.bio}
-                onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))}
-                placeholder="Tell the world about yourself..."
-                className={`${inputClass} resize-none`}
-              />
-            </div>
-          </div>
-
-          {/* Skills */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white mb-4">Skills</h2>
-            <div className="flex gap-3 mb-4">
-              <input
-                type="text"
-                value={skillInput}
-                onChange={(e) => setSkillInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())}
-                placeholder="Add a skill (press Enter)"
-                className={`${inputClass} flex-1`}
-              />
-              <button onClick={addSkill} className="bg-blue-600 hover:bg-blue-700 transition px-4 py-3 rounded-xl text-white">
-                <Plus size={18} />
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {form.skills.map((skill) => (
-                <span key={skill} className="flex items-center gap-2 bg-slate-800 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-sm">
-                  {skill}
-                  <button onClick={() => removeSkill(skill)} className="text-slate-500 hover:text-red-400 transition">
-                    <Trash2 size={14} />
-                  </button>
-                </span>
-              ))}
-              {form.skills.length === 0 && (
-                <p className="text-slate-500 text-sm">No skills added yet. Add your first skill above.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Education */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-white">Education</h2>
-              <button onClick={addEducation} className="flex items-center gap-1 text-blue-400 hover:text-blue-300 text-sm font-medium transition">
-                <Plus size={16} /> Add
-              </button>
-            </div>
-            {form.education.length === 0 && (
-              <p className="text-slate-500 text-sm">No education added. Click &quot;Add&quot; to add your education.</p>
-            )}
-            {form.education.map((edu, i) => (
-              <div key={i} className="bg-slate-800 rounded-xl p-4 mb-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                  <input value={edu.college} onChange={(e) => updateEducation(i, "college", e.target.value)}
-                    placeholder="College / University" className={inputClass} />
-                  <input value={edu.degree} onChange={(e) => updateEducation(i, "degree", e.target.value)}
-                    placeholder="Degree (e.g. B.Tech)" className={inputClass} />
-                  <input value={edu.fieldOfStudy} onChange={(e) => updateEducation(i, "fieldOfStudy", e.target.value)}
-                    placeholder="Field of Study" className={inputClass} />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input value={edu.startYear} onChange={(e) => updateEducation(i, "startYear", e.target.value)}
-                      placeholder="Start Year" className={inputClass} />
-                    <input value={edu.endYear} onChange={(e) => updateEducation(i, "endYear", e.target.value)}
-                      placeholder="End Year" className={inputClass} />
+        <section className="app-card p-6">
+          <div className="flex flex-col gap-6 md:flex-row md:items-start">
+            <div className="flex flex-col items-center gap-3 md:w-56">
+              <div className="relative">
+                {profileImagePreview ? (
+                  <img
+                    src={profileImagePreview}
+                    alt={user?.name || "Profile"}
+                    className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-md ring-1 ring-slate-200"
+                  />
+                ) : (
+                  <div className="flex h-32 w-32 items-center justify-center rounded-full bg-blue-100 text-4xl font-bold text-blue-700 shadow-sm ring-1 ring-blue-200">
+                    {user?.name?.[0] || "U"}
                   </div>
-                </div>
-                <button onClick={() => removeEducation(i)} className="text-red-400 hover:text-red-300 text-sm flex items-center gap-1 transition">
-                  <Trash2 size={14} /> Remove
-                </button>
+                )}
+                <label className="absolute bottom-1 right-1 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-white shadow-sm transition hover:bg-blue-700">
+                  <Camera size={17} />
+                  <input type="file" accept="image/png,image/jpeg,image/jpg" onChange={handlePhotoChange} className="hidden" />
+                </label>
               </div>
-            ))}
-          </div>
-
-          {/* Work Experience */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-white">Work Experience</h2>
-              <button onClick={addWork} className="flex items-center gap-1 text-blue-400 hover:text-blue-300 text-sm font-medium transition">
-                <Plus size={16} /> Add
-              </button>
+              <p className="text-center text-xs text-slate-500">JPG or PNG, maximum 5 MB.</p>
             </div>
-            {form.workExperience.length === 0 && (
-              <p className="text-slate-500 text-sm">No experience added yet.</p>
-            )}
-            {form.workExperience.map((work, i) => (
-              <div key={i} className="bg-slate-800 rounded-xl p-4 mb-3">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                  <input value={work.company} onChange={(e) => updateWork(i, "company", e.target.value)}
-                    placeholder="Company Name" className={inputClass} />
-                  <input value={work.position} onChange={(e) => updateWork(i, "position", e.target.value)}
-                    placeholder="Position / Role" className={inputClass} />
-                  <input value={work.startDate} onChange={(e) => updateWork(i, "startDate", e.target.value)}
-                    placeholder="Start Date (e.g. Jan 2022)" className={inputClass} />
-                  <input value={work.endDate} onChange={(e) => updateWork(i, "endDate", e.target.value)}
-                    placeholder="End Date (or Present)" className={inputClass} />
-                </div>
-                <textarea
-                  rows={2}
-                  value={work.description}
-                  onChange={(e) => updateWork(i, "description", e.target.value)}
-                  placeholder="Brief description of responsibilities..."
-                  className={`${inputClass} resize-none mb-3`}
+
+            <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="app-label">Full Name</label>
+                <input value={user?.name || ""} readOnly className="app-input cursor-not-allowed bg-slate-50 text-slate-500" />
+              </div>
+              <div>
+                <label className="app-label">Username</label>
+                <input value={`@${user?.username || ""}`} readOnly className="app-input cursor-not-allowed bg-slate-50 text-slate-500" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="app-label">Professional Headline</label>
+                <input
+                  value={form.headline}
+                  onChange={(event) => setForm((prev) => ({ ...prev, headline: event.target.value }))}
+                  placeholder="Full Stack Developer"
+                  className="app-input"
                 />
-                <button onClick={() => removeWork(i)} className="text-red-400 hover:text-red-300 text-sm flex items-center gap-1 transition">
+              </div>
+              <div className="md:col-span-2">
+                <label className="app-label">Bio</label>
+                <textarea
+                  rows={4}
+                  value={form.bio}
+                  onChange={(event) => setForm((prev) => ({ ...prev, bio: event.target.value }))}
+                  placeholder="A short, clear summary of your work and interests."
+                  className="app-input resize-none"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="app-card p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-slate-950">
+            <User size={18} className="text-blue-600" />
+            Skills
+          </h2>
+          <div className="mb-4 flex gap-3">
+            <input
+              value={skillInput}
+              onChange={(event) => setSkillInput(event.target.value)}
+              onKeyDown={(event) => event.key === "Enter" && (event.preventDefault(), addSkill())}
+              placeholder="Add a skill"
+              className="app-input"
+            />
+            <button onClick={addSkill} className="app-button-primary px-4">
+              <Plus size={18} />
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {form.skills.map((skill) => (
+              <span key={skill} className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700">
+                {skill}
+                <button onClick={() => removeSkill(skill)} className="text-slate-400 transition hover:text-red-500">
+                  <Trash2 size={14} />
+                </button>
+              </span>
+            ))}
+            {form.skills.length === 0 && <p className="text-sm text-slate-500">Add the skills you want visitors to notice first.</p>}
+          </div>
+        </section>
+
+        <section className="app-card p-6">
+          <h2 className="mb-4 text-lg font-bold text-slate-950">Profile Links</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {linkFields.map(({ key, label, icon: Icon, badge, placeholder }) => (
+              <div key={key}>
+                <label className="app-label">{label}</label>
+                <div className="relative">
+                  {Icon ? (
+                    <Icon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  ) : (
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">{badge}</span>
+                  )}
+                  <input
+                    type="url"
+                    value={form.socialLinks[key] || ""}
+                    onChange={(event) => setForm((prev) => ({
+                      ...prev,
+                      socialLinks: { ...prev.socialLinks, [key]: event.target.value },
+                    }))}
+                    placeholder={placeholder}
+                    className="app-input pl-11"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="app-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-950">Education</h2>
+            <button onClick={addEducation} className="app-button-secondary px-4 py-2">
+              <Plus size={16} /> Add
+            </button>
+          </div>
+          <div className="space-y-3">
+            {form.education.length === 0 && <p className="text-sm text-slate-500">No education added yet.</p>}
+            {form.education.map((education, index) => (
+              <div key={index} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <input value={education.college} onChange={(event) => updateEducation(index, "college", event.target.value)} placeholder="College / University" className="app-input" />
+                  <input value={education.degree} onChange={(event) => updateEducation(index, "degree", event.target.value)} placeholder="Degree" className="app-input" />
+                  <input value={education.fieldOfStudy} onChange={(event) => updateEducation(index, "fieldOfStudy", event.target.value)} placeholder="Field of Study" className="app-input" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <input value={education.startYear} onChange={(event) => updateEducation(index, "startYear", event.target.value)} placeholder="Start Year" className="app-input" />
+                    <input value={education.endYear} onChange={(event) => updateEducation(index, "endYear", event.target.value)} placeholder="End Year" className="app-input" />
+                  </div>
+                </div>
+                <button onClick={() => removeEducation(index)} className="inline-flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-700">
                   <Trash2 size={14} /> Remove
                 </button>
               </div>
             ))}
           </div>
+        </section>
 
-          {/* Social Links */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white mb-4">Social Links</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { key: "github", icon: Github, placeholder: "https://github.com/username" },
-                { key: "linkedin", icon: Linkedin, placeholder: "https://linkedin.com/in/username" },
-                { key: "portfolio", icon: Globe, placeholder: "https://yourportfolio.com" },
-                { key: "twitter", icon: Twitter, placeholder: "https://twitter.com/username" },
-              ].map(({ key, icon: Icon, placeholder }) => (
-                <div key={key}>
-                  <label className={labelClass}>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
-                  <div className="relative">
-                    <Icon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-                    <input
-                      type="url"
-                      value={form.socialLinks[key]}
-                      onChange={(e) =>
-                        setForm((p) => ({
-                          ...p,
-                          socialLinks: { ...p.socialLinks, [key]: e.target.value },
-                        }))
-                      }
-                      placeholder={placeholder}
-                      className={`${inputClass} pl-10`}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+        <section className="app-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-950">Work Experience</h2>
+            <button onClick={addWork} className="app-button-secondary px-4 py-2">
+              <Plus size={16} /> Add
+            </button>
           </div>
+          <div className="space-y-3">
+            {form.workExperience.length === 0 && <p className="text-sm text-slate-500">No experience added yet.</p>}
+            {form.workExperience.map((work, index) => (
+              <div key={index} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <input value={work.company} onChange={(event) => updateWork(index, "company", event.target.value)} placeholder="Company" className="app-input" />
+                  <input value={work.position} onChange={(event) => updateWork(index, "position", event.target.value)} placeholder="Position" className="app-input" />
+                  <input value={work.startDate} onChange={(event) => updateWork(index, "startDate", event.target.value)} placeholder="Start Date" className="app-input" />
+                  <input value={work.endDate} onChange={(event) => updateWork(index, "endDate", event.target.value)} placeholder="End Date or Present" className="app-input" />
+                </div>
+                <textarea value={work.description} onChange={(event) => updateWork(index, "description", event.target.value)} rows={2} placeholder="Short description" className="app-input mb-3 resize-none" />
+                <button onClick={() => removeWork(index)} className="inline-flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-700">
+                  <Trash2 size={14} /> Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
 
-          {/* Save Button */}
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 transition py-4 rounded-xl text-white font-semibold"
-          >
-            {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-            {saving ? "Saving..." : "Save All Changes"}
-          </button>
-        </div>
+        <button onClick={handleSave} disabled={saving} className="app-button-primary w-full py-4">
+          {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+          {saving ? "Saving Profile" : "Save All Changes"}
+        </button>
       </div>
     </DashboardLayout>
   );

@@ -22,7 +22,7 @@ const PublicProfile = lazy(() => import("./pages/PublicProfile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const PageFallback = () => (
-  <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+  <div className="min-h-screen bg-slate-50 flex items-center justify-center">
     <Loader />
   </div>
 );
@@ -33,9 +33,9 @@ export default function App() {
       <Toaster
         position="top-right"
         toastOptions={{
-          style: { background: "#1e293b", color: "#fff", border: "1px solid #334155" },
-          success: { iconTheme: { primary: "#22c55e", secondary: "#fff" } },
-          error:   { iconTheme: { primary: "#ef4444", secondary: "#fff" } },
+          style: { background: "#ffffff", color: "#0f172a", border: "1px solid #e2e8f0" },
+          success: { iconTheme: { primary: "#16a34a", secondary: "#fff" } },
+          error:   { iconTheme: { primary: "#dc2626", secondary: "#fff" } },
         }}
       />
       <Suspense fallback={<PageFallback />}>

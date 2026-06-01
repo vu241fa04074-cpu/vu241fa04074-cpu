@@ -46,10 +46,12 @@ const profileSchema = new mongoose.Schema(
     ],
 
     socialLinks: {
-      linkedin: String,
       github: String,
+      linkedin: String,
+      leetcode: String,
+      hackerrank: String,
+      codechef: String,
       portfolio: String,
-      twitter: String,
     },
 
     profileImage: {

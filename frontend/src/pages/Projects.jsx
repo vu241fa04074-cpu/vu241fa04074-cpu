@@ -9,9 +9,20 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import Loader from "../components/Loader";
 import { getProjects, createProject, updateProject, deleteProject } from "../api/projectApi";
 
-const inputClass = "w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition text-sm";
+const inputClass = "app-input";
 
 const emptyForm = { title: "", description: "", technologies: "", githubLink: "", liveLink: "" };
+
+const isValidUrl = (value) => {
+  if (!value) return true;
+
+  try {
+    const url = new URL(value);
+    return ["http:", "https:"].includes(url.protocol);
+  } catch {
+    return false;
+  }
+};
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -38,6 +49,10 @@ export default function Projects() {
     e.preventDefault();
     if (!form.title.trim() || !form.description.trim()) {
       toast.error("Title and description are required.");
+      return;
+    }
+    if (!isValidUrl(form.githubLink) || !isValidUrl(form.liveLink)) {
+      toast.error("Project links must start with http:// or https://.");
       return;
     }
     const techArray = form.technologies.split(",").map((t) => t.trim()).filter(Boolean);
@@ -104,8 +119,8 @@ export default function Projects() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Projects</h1>
-          <p className="text-slate-400 mt-1">Showcase your professional work to the world.</p>
+          <h1 className="text-3xl font-bold text-slate-950">Projects</h1>
+          <p className="text-slate-600 mt-1">Showcase your work with repository and live demo links.</p>
         </div>
         <button
           onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}
@@ -123,14 +138,14 @@ export default function Projects() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-slate-900 border border-slate-700 rounded-2xl p-6 mb-8 overflow-hidden"
+            className="app-card mb-8 overflow-hidden p-6"
           >
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <FolderKanban size={20} className="text-blue-400" />
+              <h2 className="text-xl font-bold text-slate-950 flex items-center gap-2">
+                <FolderKanban size={20} className="text-blue-600" />
                 {editingId ? "Edit Project" : "Add New Project"}
               </h2>
-              <button onClick={cancelEdit} className="text-slate-400 hover:text-white transition">
+              <button onClick={cancelEdit} className="text-slate-400 hover:text-slate-950 transition">
                 <X size={20} />
               </button>
             </div>
@@ -138,28 +153,28 @@ export default function Projects() {
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Project Title *</label>
+                  <label className="app-label">Project Title *</label>
                   <input name="title" value={form.title} onChange={handleChange}
                     placeholder="My Awesome Project" className={inputClass} required />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Technologies (comma separated)</label>
+                  <label className="app-label">Technologies (comma separated)</label>
                   <input name="technologies" value={form.technologies} onChange={handleChange}
                     placeholder="React, Node.js, MongoDB" className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">GitHub Repository URL</label>
+                  <label className="app-label">GitHub Repository URL</label>
                   <input name="githubLink" value={form.githubLink} onChange={handleChange}
                     placeholder="https://github.com/username/repo" className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Live Demo URL</label>
+                  <label className="app-label">Live Demo URL</label>
                   <input name="liveLink" value={form.liveLink} onChange={handleChange}
                     placeholder="https://yourproject.com" className={inputClass} />
                 </div>
               </div>
               <div className="mb-5">
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Description *</label>
+                <label className="app-label">Description *</label>
                 <textarea name="description" value={form.description} onChange={handleChange}
                   rows={4} placeholder="Describe what this project does..." className={`${inputClass} resize-none`} required />
               </div>
@@ -170,7 +185,7 @@ export default function Projects() {
                   {submitting ? "Saving..." : editingId ? "Update Project" : "Add Project"}
                 </button>
                 <button type="button" onClick={cancelEdit}
-                  className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition text-white text-sm">
+                  className="app-button-secondary">
                   Cancel
                 </button>
               </div>
@@ -183,10 +198,10 @@ export default function Projects() {
       {loading ? (
         <div className="flex items-center justify-center h-64"><Loader /></div>
       ) : projects.length === 0 ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-16 text-center">
-          <FolderKanban size={48} className="mx-auto text-slate-600 mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">No Projects Yet</h2>
-          <p className="text-slate-400">Add your first project to start building your portfolio.</p>
+        <div className="app-card p-16 text-center">
+          <FolderKanban size={48} className="mx-auto text-slate-300 mb-4" />
+          <h2 className="text-xl font-bold text-slate-950 mb-2">No Projects Yet</h2>
+          <p className="text-slate-600">Add your first project to start building your portfolio.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5">
@@ -196,24 +211,24 @@ export default function Projects() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="bg-slate-900 border border-slate-800 hover:border-slate-600 transition-colors rounded-2xl p-6"
+              className="app-card p-6 transition hover:border-blue-200 hover:shadow-md"
             >
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 flex-wrap mb-2">
-                    <h2 className="text-xl font-bold text-white">{project.title}</h2>
+                    <h2 className="text-xl font-bold text-slate-950">{project.title}</h2>
                     {project.verified && (
                       <span className="flex items-center gap-1 text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/20 px-2.5 py-1 rounded-full">
                         <BadgeCheck size={12} /> Verified
                       </span>
                     )}
                   </div>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-4">{project.description}</p>
+                  <p className="text-slate-600 text-sm leading-relaxed mb-4">{project.description}</p>
 
                   {project.technologies?.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {project.technologies.map((tech) => (
-                        <span key={tech} className="flex items-center gap-1 bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg text-xs">
+                        <span key={tech} className="flex items-center gap-1 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg text-xs">
                           <Tag size={10} />
                           {tech}
                         </span>
@@ -224,13 +239,13 @@ export default function Projects() {
                   <div className="flex flex-wrap gap-3">
                     {project.githubLink && (
                       <a href={project.githubLink} target="_blank" rel="noreferrer"
-                        className="flex items-center gap-1.5 text-slate-400 hover:text-white transition text-sm bg-slate-800 px-3 py-1.5 rounded-lg">
+                        className="flex items-center gap-1.5 text-slate-700 hover:text-blue-700 transition text-sm bg-slate-100 px-3 py-1.5 rounded-lg">
                         <Github size={14} /> GitHub
                       </a>
                     )}
                     {project.liveLink && (
                       <a href={project.liveLink} target="_blank" rel="noreferrer"
-                        className="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition text-sm bg-blue-500/10 px-3 py-1.5 rounded-lg">
+                        className="flex items-center gap-1.5 text-blue-700 hover:text-blue-800 transition text-sm bg-blue-50 px-3 py-1.5 rounded-lg">
                         <ExternalLink size={14} /> Live Demo
                       </a>
                     )}
@@ -239,7 +254,7 @@ export default function Projects() {
 
                 <div className="flex items-center gap-2">
                   <button onClick={() => handleEdit(project)}
-                    className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition text-slate-300">
+                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition text-slate-600">
                     <Pencil size={16} />
                   </button>
                   <button onClick={() => handleDelete(project._id)}

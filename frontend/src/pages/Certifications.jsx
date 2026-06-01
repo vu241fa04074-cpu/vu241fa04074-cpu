@@ -12,7 +12,7 @@ import {
   updateCertification, deleteCertification,
 } from "../api/certificationApi";
 
-const inputClass = "w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition text-sm";
+const inputClass = "app-input";
 const emptyForm = { title: "", issuer: "", issueDate: "", credentialId: "", credentialUrl: "", file: null };
 
 export default function Certifications() {
@@ -103,8 +103,8 @@ export default function Certifications() {
     <DashboardLayout>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Certifications</h1>
-          <p className="text-slate-400 mt-1">Showcase your verified professional certifications.</p>
+          <h1 className="text-3xl font-black text-slate-950">Certifications</h1>
+          <p className="text-slate-600 mt-1">Showcase your verified professional certifications.</p>
         </div>
         <button
           onClick={() => { setShowForm(true); setEditingId(null); setForm(emptyForm); }}
@@ -121,48 +121,48 @@ export default function Certifications() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-slate-900 border border-slate-700 rounded-2xl p-6 mb-8 overflow-hidden"
+            className="app-card mb-8 overflow-hidden p-6"
           >
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Award size={20} className="text-green-400" />
+              <h2 className="text-xl font-bold text-slate-950 flex items-center gap-2">
+                <Award size={20} className="text-emerald-600" />
                 {editingId ? "Edit Certification" : "Add Certification"}
               </h2>
               <button onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }}
-                className="text-slate-400 hover:text-white transition">
+                className="text-slate-400 hover:text-slate-950 transition">
                 <X size={20} />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Certificate Title *</label>
+                  <label className="app-label">Certificate Title *</label>
                   <input name="title" value={form.title} onChange={handleChange}
                     placeholder="AWS Certified Developer" className={inputClass} required />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Issuing Organization *</label>
+                  <label className="app-label">Issuing Organization *</label>
                   <input name="issuer" value={form.issuer} onChange={handleChange}
                     placeholder="Amazon Web Services" className={inputClass} required />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Issue Date</label>
+                  <label className="app-label">Issue Date</label>
                   <input name="issueDate" type="date" value={form.issueDate} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Credential ID</label>
+                  <label className="app-label">Credential ID</label>
                   <input name="credentialId" value={form.credentialId} onChange={handleChange}
                     placeholder="e.g. AWS-12345" className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Credential URL</label>
+                  <label className="app-label">Credential URL</label>
                   <input name="credentialUrl" value={form.credentialUrl} onChange={handleChange}
                     placeholder="https://verify.example.com/..." className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Upload Certificate (PDF/Image)</label>
+                  <label className="app-label">Upload Certificate (PDF/Image)</label>
                   <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleChange}
-                    className={`${inputClass} file:mr-3 file:bg-slate-700 file:text-white file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:text-sm cursor-pointer`} />
+                    className={`${inputClass} cursor-pointer file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-blue-700`} />
                 </div>
               </div>
               <div className="flex gap-3">
@@ -172,7 +172,7 @@ export default function Certifications() {
                   {submitting ? "Saving..." : editingId ? "Update" : "Add Certificate"}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm); }}
-                  className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition text-white text-sm">
+                  className="app-button-secondary">
                   Cancel
                 </button>
               </div>
@@ -184,10 +184,10 @@ export default function Certifications() {
       {loading ? (
         <div className="flex items-center justify-center h-64"><Loader /></div>
       ) : certs.length === 0 ? (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-16 text-center">
-          <Award size={48} className="mx-auto text-slate-600 mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">No Certifications Yet</h2>
-          <p className="text-slate-400">Add your certifications to boost your credibility.</p>
+        <div className="app-card p-16 text-center">
+          <Award size={48} className="mx-auto text-slate-300 mb-4" />
+          <h2 className="text-xl font-bold text-slate-950 mb-2">No Certifications Yet</h2>
+          <p className="text-slate-600">Add your certifications to boost your credibility.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -197,19 +197,19 @@ export default function Certifications() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="bg-slate-900 border border-slate-800 hover:border-slate-600 transition-colors rounded-2xl p-5"
+              className="app-card p-5 transition hover:border-blue-200 hover:shadow-md"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <h2 className="text-lg font-bold text-white">{cert.title}</h2>
+                    <h2 className="text-lg font-bold text-slate-950">{cert.title}</h2>
                     {cert.verified && (
                       <span className="flex items-center gap-1 text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/20 px-2 py-0.5 rounded-full">
                         <BadgeCheck size={11} /> Verified
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 text-slate-400 text-sm mb-1">
+                  <div className="flex items-center gap-1.5 text-slate-600 text-sm mb-1">
                     <Building size={13} />
                     {cert.issuer}
                   </div>
@@ -224,14 +224,14 @@ export default function Certifications() {
                   )}
                   {cert.credentialUrl && (
                     <a href={cert.credentialUrl} target="_blank" rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 text-xs transition">
+                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-xs transition">
                       <ExternalLink size={12} /> Verify Certificate
                     </a>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => handleEdit(cert)}
-                    className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition text-slate-300">
+                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition text-slate-600">
                     <Pencil size={15} />
                   </button>
                   <button onClick={() => handleDelete(cert._id)}
